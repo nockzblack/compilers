@@ -70,9 +70,20 @@ precedence = (
 names = {}
 
 
+def print_p(p):
+    try:
+        print("P[0] -> ", p[0])
+        print("P[1] -> ", p[1])
+        print("P[2] -> ", p[2])
+        print("P[3] -> ", p[3])
+    except:
+        pass
+
+
 def p_statement_declare_int(p):
     '''statement : INTDEC NAME is_assing '''
-    names[p[2]] = {"type": "INT", "value": 0}
+    print("p_statement_declare_int")
+    names[p[2]] = {"type": "INT", "value": p[3]}
 
 
 def p_statement_declare_float(p):
@@ -81,9 +92,11 @@ def p_statement_declare_float(p):
 
 
 def p_is_assing(p):
-    '''is_assing : "=" expression | '''
-    if 4 in p:
-        names[p[2]] = {"type": "INT", "value": p[4]}
+    '''is_assing : "=" expression 
+                | '''
+    p[0] = 0
+    if len(p) >= 2:
+        p[0] = p[2]
 
 
 def p_stament_print(p):
