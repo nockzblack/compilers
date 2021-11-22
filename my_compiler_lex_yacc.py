@@ -11,19 +11,23 @@ sys.path.insert(0, "../..")
 if sys.version_info[0] >= 3:
     raw_input = input
 
-tokens = (
-    'NAME', 'INUMBER', 'FNUMBER', 'INTDEC', 'FLOATDEC', 'PRINTFUNC'
-)
+literals = ['=', '+', '-', '*', '/', '(', ')']
+reserved = {
+    'int': 'INTDEC',
+    'float': 'FLOATDEC',
+    'print': 'PRINTFUNC'
+}
 
-literals = ['=', '+', '-', '(', ')']
+tokens = [
+    'INUMBER', 'FNUMBER', 'NAME'
+] + list(reserved.values())
+
 
 # Tokens
-t_INTDEC = r'int'
-t_FLOATDEC = r'float'
-t_PRINTFUNC = r'print'
-t_NAME = r'[a-eg-hj-oq-z]'
-
-# FIXME: there is a bug on vars that are in the tokens strings
+def t_NAME(t):
+    r'[a-zA-Z_][a-zA-Z_0-9]*'
+    t.type = reserved.get(t.value, 'NAME')    # Check for reserved words
+    return t
 
 
 def t_FNUMBER(t):
@@ -54,10 +58,11 @@ def t_error(t):
 # Build the lexer
 lex.lex()
 
-# Parsing rules
 
+# Parsing rules
 precedence = (
     ('left', '+', '-'),
+    ('left', '*', '/'),
     ('right', 'UMINUS'),
 )
 
@@ -66,13 +71,19 @@ names = {}
 
 
 def p_statement_declare_int(p):
-    'statement : INTDEC NAME'
+    '''statement : INTDEC NAME is_assing '''
     names[p[2]] = {"type": "INT", "value": 0}
 
 
 def p_statement_declare_float(p):
     'statement : FLOATDEC NAME'
     names[p[2]] = {"type": "FLOAT", "value": 0}
+
+
+def p_is_assing(p):
+    '''is_assing : "=" expression | '''
+    if 4 in p:
+        names[p[2]] = {"type": "INT", "value": p[4]}
 
 
 def p_stament_print(p):
@@ -95,11 +106,17 @@ def p_statement_expr(p):
 
 def p_expression_binop(p):
     '''expression : expression '+' expression
-                  | expression '-' expression'''
+                  | expression '-' expression
+                  | expression '*' expression
+                  | expression '/' expression'''
     if p[2] == '+':
         p[0] = p[1] + p[3]
     elif p[2] == '-':
         p[0] = p[1] - p[3]
+    elif p[2] == '*':
+        p[0] = p[1] * p[3]
+    elif p[2] == '/':
+        p[0] = p[1] / p[3]
 
 
 def p_expression_uminus(p):
@@ -114,13 +131,11 @@ def p_expression_group(p):
 
 def p_expression_inumber(p):
     "expression : INUMBER"
-    print("Integer")
     p[0] = p[1]
 
 
 def p_expression_fnumber(p):
     "expression : FNUMBER"
-    print("Float")
     p[0] = p[1]
 
 
@@ -135,7 +150,9 @@ def p_expression_name(p):
 
 def p_error(p):
     if p:
-        print("Syntax error at '%s'" % p.value)
+        print(p)
+        print("Syntax error at line '%s' character '%s'" %
+              (p.lexpos, p.lineno))
     else:
         print("Syntax error at EOF")
 
