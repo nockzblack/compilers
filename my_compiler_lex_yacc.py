@@ -12,14 +12,18 @@ if sys.version_info[0] >= 3:
     raw_input = input
 
 tokens = (
-    'NAME', 'INUMBER', 'FNUMBER',
+    'NAME', 'INUMBER', 'FNUMBER', 'INTDEC', 'FLOATDEC', 'PRINTFUNC'
 )
 
-literals = ['=', '+', '-', 'i', 'f', 'p']
+literals = ['=', '+', '-']
 
 # Tokens
+t_INTDEC = r'int'
+t_FLOATDEC = r'float'
+t_PRINTFUNC = r'print'
+t_NAME = r'[a-z]'
 
-t_NAME = r'[a-eg-hj-oq-z]'
+# FIXME: there is a bug on vars that are in the tokens strings
 
 
 def t_FNUMBER(t):
@@ -62,17 +66,17 @@ names = {}
 
 
 def p_statement_declare_int(p):
-    'statement : "i" NAME'
+    'statement : INTDEC NAME'
     names[p[2]] = {"type": "INT", "value": 0}
 
 
 def p_statement_declare_float(p):
-    'statement : "f" NAME'
+    'statement : FLOATDEC NAME'
     names[p[2]] = {"type": "FLOAT", "value": 0}
 
 
 def p_stament_print(p):
-    'statement : "p" expression'
+    'statement : PRINTFUNC expression'
     print(p[2])
 
 
@@ -138,14 +142,13 @@ def p_error(p):
 
 yacc.yacc()
 
-
+""" 
 # Read file and compile
 f = open("code.txt")
 code = f.read()
 yacc.parse(code)
-
-
 """
+
 # Module to read from comamnd line
 while 1:
     try:
@@ -155,4 +158,3 @@ while 1:
     if not s:
         continue
     yacc.parse(s)
-"""
