@@ -15,13 +15,13 @@ tokens = (
     'NAME', 'INUMBER', 'FNUMBER', 'INTDEC', 'FLOATDEC', 'PRINTFUNC'
 )
 
-literals = ['=', '+', '-']
+literals = ['=', '+', '-', '(', ')']
 
 # Tokens
 t_INTDEC = r'int'
 t_FLOATDEC = r'float'
 t_PRINTFUNC = r'print'
-t_NAME = r'[a-z]'
+t_NAME = r'[a-eg-hj-oq-z]'
 
 # FIXME: there is a bug on vars that are in the tokens strings
 
@@ -76,8 +76,8 @@ def p_statement_declare_float(p):
 
 
 def p_stament_print(p):
-    'statement : PRINTFUNC expression'
-    print(p[2])
+    '''statement : PRINTFUNC '(' expression ')' '''
+    print(p[3])
 
 
 def p_statement_assign(p):
