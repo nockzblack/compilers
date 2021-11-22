@@ -82,20 +82,22 @@ def print_p(p):
 
 def p_statement_declare_int(p):
     '''statement : INTDEC NAME is_assing '''
-    print("p_statement_declare_int")
-    names[p[2]] = {"type": "INT", "value": p[3]}
+    if type(p[3]) == float:
+        print("Not possible to assing float to int var")
+    else:
+        names[p[2]] = {"type": "INT", "value": p[3]}
 
 
 def p_statement_declare_float(p):
-    'statement : FLOATDEC NAME'
-    names[p[2]] = {"type": "FLOAT", "value": 0}
+    'statement : FLOATDEC NAME is_assing'
+    names[p[2]] = {"type": "FLOAT", "value": float(p[3])}
 
 
 def p_is_assing(p):
     '''is_assing : "=" expression 
                 | '''
     p[0] = 0
-    if len(p) >= 2:
+    if len(p) > 2:
         p[0] = p[2]
 
 
@@ -165,7 +167,7 @@ def p_error(p):
     if p:
         print(p)
         print("Syntax error at line '%s' character '%s'" %
-              (p.lexpos, p.lineno))
+              (p.lineno, p.lexpos))
     else:
         print("Syntax error at EOF")
 
