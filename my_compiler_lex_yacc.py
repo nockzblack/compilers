@@ -139,11 +139,20 @@ def p_error(p):
 yacc.yacc()
 
 
+# Read file and compile
+f = open("code.txt")
+code = f.read()
+yacc.parse(code)
+
+
+"""
+# Module to read from comamnd line
 while 1:
     try:
-        s = raw_input('calc > ')
+        s = raw_input('compiler > ')
     except EOFError:
         break
     if not s:
         continue
     yacc.parse(s)
+"""
