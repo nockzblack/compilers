@@ -1,4 +1,0 @@
-float b
-int a
-a = 12
-b = a + 4.16
