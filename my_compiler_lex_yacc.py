@@ -3,9 +3,37 @@
 #
 # -----------------------------------------------------------------------------
 
+
+# TODO Sistema de tipos
+# TODO Sistema de tipos -> Int
+# TODO Sistema de tipos -> Float
+# TODO Sistema de tipos -> String
+# TODO Sistema de tipos -> Bolean
+
+# TODO Operaciones
+# TODO Operaciones Aritmeticas
+# TODO Operaciones de Comparación
+# TODO Operaciones Booleaneas
+# TODO Operaciones de Bloques
+
+# TODO Operaciones permitidas entre el sistema de tipos
+# TODO Flujo de Control
+# TODO Flujo de Control -> if
+# TODO Flujo de Control -> else
+# TODO Flujo de Control -> elif
+# TODO Flujo de Control -> while
+# TODO Flujo de Control -> for
+
+# TODO ; al final de cada sentenca
+# TODO Es permitido el declarar y asignar una variable en la misma linea
+# TODO Arbol Sintactico
+# TODO Salida Código de 3 direcciones
+
+
 import ply.yacc as yacc
 import ply.lex as lex
 import sys
+
 sys.path.insert(0, "../..")
 
 if sys.version_info[0] >= 3:
@@ -68,6 +96,18 @@ precedence = (
 
 # dictionary of names
 names = {}
+abstractTree = []
+
+
+class Node:
+    val = ''
+    type = ''
+    children = []
+
+    def __init__(self, val, type, children):
+        self.val = val
+        self.type = type
+        self.children = children
 
 
 def print_p(p):
@@ -86,6 +126,9 @@ def p_statement_declare_int(p):
         print("Not possible to assing float to int var")
     else:
         names[p[2]] = {"type": "INT", "value": p[3]}
+        var = Node(p[3], '=', [p[3]])
+        n = Node(p[2], 'INT', [var, p[3]])
+        abstractTree.append(n)
 
 
 def p_statement_declare_float(p):
@@ -97,7 +140,11 @@ def p_is_assing(p):
     '''is_assing : "=" expression 
                 | '''
     p[0] = 0
+    p[0] = Node(0, 'INT', [])
     if len(p) > 2:
+        p[0].type = p[2].type
+        p[0].val = p[2].val
+        p[0].children = [p[2]]
         p[0] = p[2]
 
 
