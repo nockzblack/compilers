@@ -43,15 +43,22 @@ literals = ['=', '+', '-', '*', '/', '(', ')']
 reserved = {
     'int': 'INTDEC',
     'float': 'FLOATDEC',
-    'print': 'PRINTFUNC'
+    'bool': 'BOOLDEC',
+    'string': 'STRINGDEC',
+    'print': 'PRINTFUNC',
 }
 
 tokens = [
-    'INUMBER', 'FNUMBER', 'NAME'
+    'INUMBER', 'FNUMBER', 'NAME', 'BOOL', 'STRING',
 ] + list(reserved.values())
 
 
 # Tokens
+def t_BOOL(t):
+    r'true|false'
+    return t
+
+
 def t_NAME(t):
     r'[a-zA-Z_][a-zA-Z_0-9]*'
     t.type = reserved.get(t.value, 'NAME')    # Check for reserved words
@@ -67,6 +74,11 @@ def t_FNUMBER(t):
 def t_INUMBER(t):
     r'\d+'
     t.value = int(t.value)
+    return t
+
+
+def t_STRING(t):
+    r'".*"'
     return t
 
 
@@ -126,9 +138,9 @@ def p_statement_declare_int(p):
         print("Not possible to assing float to int var")
     else:
         names[p[2]] = {"type": "INT", "value": p[3]}
-        var = Node(p[3], '=', [p[3]])
-        n = Node(p[2], 'INT', [var, p[3]])
-        abstractTree.append(n)
+        #var = Node(p[3], '=', [p[3]])
+        #n = Node(p[2], 'INT', [var, p[3]])
+        # abstractTree.append(n)
 
 
 def p_statement_declare_float(p):
@@ -136,15 +148,21 @@ def p_statement_declare_float(p):
     names[p[2]] = {"type": "FLOAT", "value": float(p[3])}
 
 
+def p_statement_declare_bool(p):
+    'statement : BOOLDEC NAME is_assing'
+    names[p[2]] = {"type": "BOOL", "value": bool(p[3])}
+
+
+def p_statement_declare_string(p):
+    'statement : STRINGDEC NAME is_assing'
+    names[p[2]] = {"type": "STRING", "value": str(p[3])}
+
+
 def p_is_assing(p):
     '''is_assing : "=" expression 
                 | '''
     p[0] = 0
-    p[0] = Node(0, 'INT', [])
     if len(p) > 2:
-        p[0].type = p[2].type
-        p[0].val = p[2].val
-        p[0].children = [p[2]]
         p[0] = p[2]
 
 
@@ -159,11 +177,6 @@ def p_statement_assign(p):
         print("You must declare a var before use it")
     else:
         names[p[1]]["value"] = p[3]
-
-
-def p_statement_expr(p):
-    'statement : expression'
-    # print(p[1])
 
 
 def p_expression_binop(p):
@@ -201,6 +214,16 @@ def p_expression_fnumber(p):
     p[0] = p[1]
 
 
+def p_expression_bool(p):
+    "expression : BOOL"
+    p[0] = p[1]
+
+
+def p_expression_string(p):
+    "expression : STRING"
+    p[0] = p[1]
+
+
 def p_expression_name(p):
     "expression : NAME"
     try:
@@ -222,11 +245,6 @@ def p_error(p):
 yacc.yacc()
 
 """ 
-# Read file and compile
-f = open("code.txt")
-code = f.read()
-yacc.parse(code)
-"""
 
 # Module to read from comamnd line
 while 1:
@@ -237,3 +255,14 @@ while 1:
     if not s:
         continue
     yacc.parse(s)
+
+"""
+
+# File input
+lines = []
+with open('code.txt') as file:
+    lines = file.readlines()
+
+for line in lines:
+    yacc.parse(line)
+print('Compiled successfully')
