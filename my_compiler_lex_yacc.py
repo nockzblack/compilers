@@ -50,7 +50,7 @@ reserved = {
 
 tokens = [
     'INUMBER', 'FNUMBER', 'NAME', 'BOOL', 'STRING', 'SEMICOLON',
-    'EQUAL', 'NOTEQUAL', 'GREATERTHAN', 'LESSTHAN', 'GREATEREQUAL', 'LESSEQUAL', 'ANDAND', 'OROR'
+    'EQUAL', 'NOTEQUAL', 'GREATERTHAN', 'LESSTHAN', 'GREATEREQUAL', 'LESSEQUAL', 'ANDAND', 'OROR',
 ] + list(reserved.values())
 
 
@@ -283,7 +283,7 @@ def p_expression_bool(p):
 def p_expression_string(p):
     "expression : STRING"
     print("p_expression_string")
-    p[0] = p[1]
+    p[0] = p[1][1:len(p[1]) - 1]
 
 
 def p_expression_name(p):
