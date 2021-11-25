@@ -50,6 +50,7 @@ reserved = {
 
 tokens = [
     'INUMBER', 'FNUMBER', 'NAME', 'BOOL', 'STRING', 'SEMICOLON',
+    'EQUAL', 'NOTEQUAL', 'GREATERTHAN', 'LESSTHAN', 'GREATEREQUAL', 'LESSEQUAL', 'ANDAND', 'OROR'
 ] + list(reserved.values())
 
 
@@ -83,7 +84,14 @@ def t_STRING(t):
 
 
 t_SEMICOLON = r';'
-
+t_EQUAL = r'=='
+t_NOTEQUAL = r'!='
+t_GREATEREQUAL = r'>='
+t_LESSEQUAL = r'<='
+t_GREATERTHAN = r'>'
+t_LESSTHAN = r'<'
+t_ANDAND = r'&&'
+t_OROR = r'\|\|'
 t_ignore = " \t"
 
 
@@ -130,6 +138,7 @@ def print_p(p):
         print("P[1] -> ", p[1])
         print("P[2] -> ", p[2])
         print("P[3] -> ", p[3])
+        print("P[4] -> ", p[4])
     except:
         pass
 
@@ -144,8 +153,8 @@ def p_statement_declare_int(p):
         print("Not possible to assing float to int var")
     else:
         names[p[2]] = {"type": "INT", "value": p[3]}
-        #var = Node(p[3], '=', [p[3]])
-        #n = Node(p[2], 'INT', [var, p[3]])
+        # var = Node(p[3], '=', [p[3]])
+        # n = Node(p[2], 'INT', [var, p[3]])
         # abstractTree.append(n)
 
 
@@ -156,7 +165,10 @@ def p_statement_declare_float(p):
 
 def p_statement_declare_bool(p):
     'statement : BOOLDEC NAME is_assing'
-    names[p[2]] = {"type": "BOOL", "value": bool(p[3])}
+    if p[3] == "false":
+        names[p[2]] = {"type": "BOOL", "value": False}
+    elif p[3] == "true":
+        names[p[2]] = {"type": "BOOL", "value": True}
 
 
 def p_statement_declare_string(p):
@@ -165,7 +177,7 @@ def p_statement_declare_string(p):
 
 
 def p_is_assing(p):
-    '''is_assing : "=" expression 
+    '''is_assing : "=" expression
                 | '''
     p[0] = 0
     if len(p) > 2:
@@ -174,6 +186,7 @@ def p_is_assing(p):
 
 def p_stament_print(p):
     '''statement : PRINTFUNC '(' expression ')' '''
+    print("p_stament_print")
     print(p[3])
 
 
@@ -185,11 +198,50 @@ def p_statement_assign(p):
         names[p[1]]["value"] = p[3]
 
 
+def p_boolexpr_andornot(p):
+    '''expression : expression ANDAND expression
+                | expression OROR expression '''
+    print("p_boolexpr_andornot")
+
+    if p[2] == '&&':
+        p[0] = p[1] and p[3]
+    elif p[2] == '||':
+        p[0] = p[1] or p[3]
+
+
+def p_bool_expression_comparison(p):
+    '''expression : expression EQUAL expression
+                | expression NOTEQUAL expression
+                | expression GREATERTHAN expression
+                | expression LESSTHAN expression
+                | expression LESSEQUAL expression
+                | expression GREATEREQUAL expression'''
+
+    print("p_bool_expression_comparison")
+
+    if p[2] == '<':
+        p[0] = p[1] < p[3]
+    elif p[2] == '<=':
+        p[0] = p[1] <= p[3]
+    elif p[2] == '==':
+        p[0] = p[1] == p[3]
+    elif p[2] == '!=':
+        p[0] = p[1] != p[3]
+    elif p[2] == '>=':
+        p[0] = p[1] >= p[3]
+    elif p[2] == '>':
+        p[0] = p[1] > p[3]
+
+
 def p_expression_binop(p):
     '''expression : expression '+' expression
                   | expression '-' expression
+                  | expression '/' expression
                   | expression '*' expression
-                  | expression '/' expression'''
+                  | expression '^' expression '''
+
+    print("p_expression_binop")
+
     if p[2] == '+':
         p[0] = p[1] + p[3]
     elif p[2] == '-':
@@ -198,6 +250,8 @@ def p_expression_binop(p):
         p[0] = p[1] * p[3]
     elif p[2] == '/':
         p[0] = p[1] / p[3]
+    elif p[2] == '^':
+        p[0] = p[1] ** p[3]
 
 
 def p_expression_uminus(p):
@@ -222,16 +276,19 @@ def p_expression_fnumber(p):
 
 def p_expression_bool(p):
     "expression : BOOL"
+    print("p_expression_bool")
     p[0] = p[1]
 
 
 def p_expression_string(p):
     "expression : STRING"
+    print("p_expression_string")
     p[0] = p[1]
 
 
 def p_expression_name(p):
     "expression : NAME"
+    print("p_expression_name")
     try:
         p[0] = names[p[1]]["value"]
     except LookupError:
@@ -248,7 +305,7 @@ def p_error(p):
         print("Syntax error at EOF")
 
 
-yacc.yacc()
+yacc.yacc(debug=True)
 
 """ 
 
