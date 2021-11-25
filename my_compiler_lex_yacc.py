@@ -10,11 +10,11 @@
 # DONE Sistema de tipos -> String
 # DONE Sistema de tipos -> Bolean
 
-# TODO Operaciones
-# TODO Operaciones Aritmeticas
-# TODO Operaciones de Comparación
-# TODO Operaciones Booleaneas
-# TODO Operaciones de Bloques
+# DONE Operaciones
+# DONE Operaciones Aritmeticas
+# DONE Operaciones de Comparación
+# DONE Operaciones Booleaneas
+# DONE Operaciones de Bloques
 
 # TODO Operaciones permitidas entre el sistema de tipos
 # TODO Flujo de Control
@@ -46,6 +46,9 @@ reserved = {
     'bool': 'BOOLDEC',
     'string': 'STRINGDEC',
     'print': 'PRINTFUNC',
+    'if': 'IF',
+    'elif': 'ELIF',
+    'else': 'ELSE',
 }
 
 tokens = [
@@ -144,7 +147,15 @@ def print_p(p):
 
 
 def p_code(p):
-    'code : statement SEMICOLON'
+    '''code : statement SEMICOLON
+            | flow '''
+    p[0] = p[1]
+
+
+def p_block(p):
+    '''block : code block
+             | code '''
+    p[0] = p[1]
 
 
 def p_statement_declare_int(p):
@@ -296,6 +307,23 @@ def p_expression_name(p):
         p[0] = 0
 
 
+def p_flow_if(p):
+    ''' flow : IF '(' expression ')' '{' block '}' elif else '''
+    p[0] = p[1]
+
+
+def p_flow_elif(p):
+    '''elif : ELIF '(' expression ')' '{' block '}' else
+            | '''
+    p[0] = p[1]
+
+
+def p_flow_else(p):
+    '''else : ELSE '{' block '}'
+            | '''
+    p[0] = p[1]
+
+
 def p_error(p):
     if p:
         print(p)
@@ -307,7 +335,7 @@ def p_error(p):
 
 yacc.yacc(debug=True)
 
-""" 
+"""
 
 # Module to read from comamnd line
 while 1:
