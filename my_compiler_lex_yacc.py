@@ -24,7 +24,7 @@
 # TODO Flujo de Control -> while
 # TODO Flujo de Control -> for
 
-# TODO ; al final de cada sentenca
+# DONE ; al final de cada sentenca
 # DONE Es permitido el declarar y asignar una variable en la misma linea
 # TODO Arbol Sintactico
 # TODO Salida Código de 3 direcciones
@@ -49,7 +49,7 @@ reserved = {
 }
 
 tokens = [
-    'INUMBER', 'FNUMBER', 'NAME', 'BOOL', 'STRING',
+    'INUMBER', 'FNUMBER', 'NAME', 'BOOL', 'STRING', 'SEMICOLON',
 ] + list(reserved.values())
 
 
@@ -81,6 +81,8 @@ def t_STRING(t):
     r'".*"'
     return t
 
+
+t_SEMICOLON = r';'
 
 t_ignore = " \t"
 
@@ -130,6 +132,10 @@ def print_p(p):
         print("P[3] -> ", p[3])
     except:
         pass
+
+
+def p_code(p):
+    'code : statement SEMICOLON'
 
 
 def p_statement_declare_int(p):
