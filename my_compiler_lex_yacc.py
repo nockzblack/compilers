@@ -4,11 +4,11 @@
 # -----------------------------------------------------------------------------
 
 
-# TODO Sistema de tipos
-# TODO Sistema de tipos -> Int
-# TODO Sistema de tipos -> Float
-# TODO Sistema de tipos -> String
-# TODO Sistema de tipos -> Bolean
+# DONE Sistema de tipos
+# DONE Sistema de tipos -> Int
+# DONE Sistema de tipos -> Float
+# DONE Sistema de tipos -> String
+# DONE Sistema de tipos -> Bolean
 
 # TODO Operaciones
 # TODO Operaciones Aritmeticas
@@ -25,7 +25,7 @@
 # TODO Flujo de Control -> for
 
 # TODO ; al final de cada sentenca
-# TODO Es permitido el declarar y asignar una variable en la misma linea
+# DONE Es permitido el declarar y asignar una variable en la misma linea
 # TODO Arbol Sintactico
 # TODO Salida Código de 3 direcciones
 
@@ -264,5 +264,6 @@ with open('code.txt') as file:
     lines = file.readlines()
 
 for line in lines:
-    yacc.parse(line)
+    if line != '\n':
+        yacc.parse(line)
 print('Compiled successfully')
