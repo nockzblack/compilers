@@ -16,11 +16,12 @@
 # DONE Operaciones Booleaneas
 # DONE Operaciones de Bloques
 
-# TODO Operaciones permitidas entre el sistema de tipos
+# DONE Operaciones permitidas entre el sistema de tipos
+
 # TODO Flujo de Control
-# TODO Flujo de Control -> if
-# TODO Flujo de Control -> else
-# TODO Flujo de Control -> elif
+# DONE Flujo de Control -> if
+# DONE Flujo de Control -> else
+# DONE Flujo de Control -> elif
 # TODO Flujo de Control -> while
 # TODO Flujo de Control -> for
 
@@ -155,7 +156,7 @@ def p_block(p):
 
 def p_code(p):
     '''code : flow
-            | statement SEMICOLON 
+            | statement SEMICOLON
             | print_statement SEMICOLON '''
     p[0] = p[1]
 
@@ -322,7 +323,7 @@ def p_flow_elif(p):
     '''elif : ELIF '(' bool_expression ')' '{' block '}' else
             | '''
     print("p_flow_elif")
-    #p[0] = p[3]
+    # p[0] = p[3]
 
 
 def p_flow_else(p):
@@ -333,6 +334,11 @@ def p_flow_else(p):
         return
     else:
         p[0] = p[3]
+
+
+def p_flow_while(p):
+    '''flow : while '(' bool_expression ')' '{' block '}' '''
+    pass
 
 
 def p_bool_expression(p):
