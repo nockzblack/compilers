@@ -39,7 +39,7 @@ sys.path.insert(0, "../..")
 if sys.version_info[0] >= 3:
     raw_input = input
 
-literals = ['=', '+', '-', '*', '/', '(', ')']
+literals = ['=', '+', '-', '*', '/', '(', ')', '{', '}']
 reserved = {
     'int': 'INTDEC',
     'float': 'FLOATDEC',
@@ -54,6 +54,7 @@ reserved = {
 tokens = [
     'INUMBER', 'FNUMBER', 'NAME', 'BOOL', 'STRING', 'SEMICOLON',
     'EQUAL', 'NOTEQUAL', 'GREATERTHAN', 'LESSTHAN', 'GREATEREQUAL', 'LESSEQUAL', 'ANDAND', 'OROR',
+
 ] + list(reserved.values())
 
 
@@ -146,15 +147,16 @@ def print_p(p):
         pass
 
 
-def p_code(p):
-    '''code : statement SEMICOLON
-            | flow '''
+def p_block(p):
+    '''block : code
+             | code block'''
     p[0] = p[1]
 
 
-def p_block(p):
-    '''block : code block
-             | code '''
+def p_code(p):
+    '''code : flow
+            | statement SEMICOLON 
+            | print_statement SEMICOLON '''
     p[0] = p[1]
 
 
@@ -196,7 +198,7 @@ def p_is_assing(p):
 
 
 def p_stament_print(p):
-    '''statement : PRINTFUNC '(' expression ')' '''
+    '''print_statement : PRINTFUNC '(' expression ')' '''
     print("p_stament_print")
     print(p[3])
 
@@ -308,20 +310,59 @@ def p_expression_name(p):
 
 
 def p_flow_if(p):
-    ''' flow : IF '(' expression ')' '{' block '}' elif else '''
-    p[0] = p[1]
+    ''' flow : IF '(' bool_expression ')' '{' block '}' elif else '''
+    print("p_flow_if")
+    if p[3] == True:
+        p[0] = p[6]
+    else:
+        pass
 
 
 def p_flow_elif(p):
-    '''elif : ELIF '(' expression ')' '{' block '}' else
+    '''elif : ELIF '(' bool_expression ')' '{' block '}' else
             | '''
-    p[0] = p[1]
+    print("p_flow_elif")
+    #p[0] = p[3]
 
 
 def p_flow_else(p):
     '''else : ELSE '{' block '}'
             | '''
-    p[0] = p[1]
+    print("p_flow_else")
+    if len(p) == 1:
+        return
+    else:
+        p[0] = p[3]
+
+
+def p_bool_expression(p):
+    '''bool_expression : expression ANDAND expression
+                | expression OROR expression
+                | expression EQUAL expression
+                | expression NOTEQUAL expression
+                | expression GREATERTHAN expression
+                | expression LESSTHAN expression
+                | expression LESSEQUAL expression
+                | expression GREATEREQUAL expression '''
+    print("p_bool_expression")
+
+    if p[2] == '&&':
+        p[0] = p[1] and p[3]
+    elif p[2] == '||':
+        p[0] = p[1] or p[3]
+    elif p[2] == '<':
+        p[0] = p[1] < p[3]
+    elif p[2] == '<=':
+        p[0] = p[1] <= p[3]
+    elif p[2] == '==':
+        p[0] = p[1] == p[3]
+
+    elif p[2] == '!=':
+        p[0] = p[1] != p[3]
+    elif p[2] == '>=':
+        p[0] = p[1] >= p[3]
+    elif p[2] == '>':
+        p[0] = p[1] > p[3]
 
 
 def p_error(p):
@@ -335,26 +376,9 @@ def p_error(p):
 
 yacc.yacc(debug=True)
 
-"""
-
-# Module to read from comamnd line
-while 1:
-    try:
-        s = raw_input('compiler > ')
-    except EOFError:
-        break
-    if not s:
-        continue
-    yacc.parse(s)
-
-"""
 
 # File input
 lines = []
 with open('code.txt') as file:
-    lines = file.readlines()
-
-for line in lines:
-    if line != '\n':
-        yacc.parse(line)
-print('Compiled successfully')
+    code = file.read()
+    yacc.parse(code)
